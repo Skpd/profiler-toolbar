@@ -1,6 +1,8 @@
 Skpd\ProfilerToolbar, v1
 =====================
 
+[![Build Status](https://travis-ci.org/Skpd/profiler-toolbar.png?branch=master)](https://travis-ci.org/Skpd/profiler-toolbar)
+
 Introduction
 ------------
 
