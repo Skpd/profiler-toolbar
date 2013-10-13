@@ -1,0 +1,26 @@
+{
+    "name": "skpd/profiler-toolbar",
+    "description": "Profiler toolbar for Zend Developer Tools",
+    "type": "library",
+    "keywords": ["Zend Developer Tools","ZendDeveloperTools","profiler","zendframework2","Zend Framework 2","toolbar"],
+    "homepage": "https://github.com/Skpd/profiler-toolbar",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Dmitry Shabanov",
+            "email": "dm.skpd@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "zendframework/zendframework": "2.2.*",
+        "zendframework/zend-developer-tools": "0.0.2",
+        "ext-xhprof": ">=0.9.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "Skpd\\ProfilerToolbar\\": "src/"
+        },
+        "classmap" : ["Module.php"]
+    }
+}
