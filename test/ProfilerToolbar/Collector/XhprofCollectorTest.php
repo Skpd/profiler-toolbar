@@ -2,6 +2,7 @@
 
 namespace Skpd\ProfilerToolbarTest\Collector;
 
+use FlightPath\Configurator\Bootstrap;
 use Skpd\ProfilerToolbar\Collector\XhprofCollector;
 use Zend\Mvc\MvcEvent;
 
@@ -33,5 +34,12 @@ class XhprofCollectorTest extends \PHPUnit_Framework_TestCase
         $collector = new XhprofCollector();
 
         $collector->collect($event);
+    }
+
+    public function testShouldCreateInstance()
+    {
+        $collector = Bootstrap::getServiceManager()->get('Skpd\ProfilerToolbar\ProfilerCollector');
+
+        $this->assertInstanceOf('Skpd\ProfilerToolbar\Collector\XhprofCollector', $collector);
     }
 }

@@ -6,7 +6,7 @@ return [
     'zenddevelopertools' => [
         'profiler' => [
             'collectors' => [
-                'profiler' => 'ProfilerToolbar\ProfilerCollector',
+                'profiler' => 'Skpd\ProfilerToolbar\ProfilerCollector',
             ],
         ],
         'toolbar' => [

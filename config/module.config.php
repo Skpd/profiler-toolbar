@@ -5,7 +5,7 @@ namespace Skpd\ProfilerToolbar;
 return [
     'service_manager' => [
         'invokables' => [
-            'ProfilerToolbar\ProfilerCollector' => 'ProfilerToolbar\Collector\XhprofCollector'
+            'Skpd\ProfilerToolbar\ProfilerCollector' => 'Skpd\ProfilerToolbar\Collector\XhprofCollector'
         ]
     ],
     'view_manager' => [
