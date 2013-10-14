@@ -61,7 +61,7 @@ class Bootstrap
 
     protected static function initAutoloader()
     {
-        include_once __DIR__ . '/../vendor/autoload.php';
+        include_once self::findParentPath('vendor') .  '/autoload.php';
     }
 
     protected static function findParentPath($path)

@@ -17,7 +17,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
         $eventManager  = $e->getTarget()->getEventManager();
 
         $eventManager->attach(ProfilerEvent::EVENT_PROFILER_INIT, function () {
-            xhprof_enable();
+            xhprof_enable(XHPROF_FLAGS_MEMORY);
         });
     }
 
