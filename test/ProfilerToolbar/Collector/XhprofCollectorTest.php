@@ -26,4 +26,12 @@ class XhprofCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $heaps['time']);
         $this->assertCount(3, $heaps['memory']);
     }
+
+    public function testShouldAvoidEmptyData()
+    {
+        $event     = new MvcEvent();
+        $collector = new XhprofCollector();
+
+        $collector->collect($event);
+    }
 }

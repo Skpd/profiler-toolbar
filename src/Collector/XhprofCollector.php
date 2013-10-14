@@ -37,33 +37,35 @@ class XhprofCollector extends AbstractCollector
     {
         $data = xhprof_disable();
 
-        $memory = new MaxHeap();
-        $time = new MaxHeap();
-        $call = new MaxHeap();
-
-        foreach ($data as $name => $values) {
-            if (!preg_match('/(?:Zend\\\\|Composer\\\\)/i', $name)) {
-                $memory->insert(['name' => $name, 'value' => $values['pmu']]);
-                $time->insert(['name' => $name, 'value' => $values['wt']]);
-                $call->insert(['name' => $name, 'value' => $values['ct']]);
-            }
-        }
-
         $this->data = [
             'memory' => [],
             'time' => [],
             'call' => [],
         ];
 
-        for ($i = 3; $i--;) {
-            $value = $memory->extract();
-            $this->data['memory'][$value['name']] = round($value['value'] / 1024 / 1024, 2) . ' Mb';
+        if (!empty($data)) {
+            $memory = new MaxHeap();
+            $time = new MaxHeap();
+            $call = new MaxHeap();
 
-            $value = $time->extract();
-            $this->data['time'][$value['name']] = round($value['value'] / 1000, 3) . ' ms';
+            foreach ($data as $name => $values) {
+                if (!preg_match('/(?:Zend\\\\|Composer\\\\)/i', $name)) {
+                    $memory->insert(['name' => $name, 'value' => $values['pmu']]);
+                    $time->insert(['name' => $name, 'value' => $values['wt']]);
+                    $call->insert(['name' => $name, 'value' => $values['ct']]);
+                }
+            }
 
-            $value = $call->extract();
-            $this->data['call'][$value['name']] = $value['value'];
+            for ($i = 3; $i--;) {
+                $value = $memory->extract();
+                $this->data['memory'][$value['name']] = round($value['value'] / 1024 / 1024, 2) . ' Mb';
+
+                $value = $time->extract();
+                $this->data['time'][$value['name']] = round($value['value'] / 1000, 3) . ' ms';
+
+                $value = $call->extract();
+                $this->data['call'][$value['name']] = $value['value'];
+            }
         }
     }
 
