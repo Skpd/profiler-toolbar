@@ -2,19 +2,24 @@
 
 namespace Skpd\ProfilerToolbar;
 
-use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\BootstrapListenerInterface;
+use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Config\Config;
+use Zend\ModuleManager\ModuleManagerInterface;
 use ZendDeveloperTools\ProfilerEvent;
 
-class Module implements AutoloaderProviderInterface, ConfigProviderInterface, BootstrapListenerInterface
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface, InitProviderInterface
 {
-    public function onBootstrap(EventInterface $e)
+    /**
+     * Initialize workflow
+     *
+     * @param  ModuleManagerInterface $manager
+     * @return void
+     */
+    public function init(ModuleManagerInterface $manager)
     {
-        /** @var \Zend\EventManager\EventManager $eventManager */
-        $eventManager  = $e->getTarget()->getEventManager();
+        $eventManager = $manager->getEventManager();
 
         $eventManager->attach(ProfilerEvent::EVENT_PROFILER_INIT, function () {
             xhprof_enable(XHPROF_FLAGS_MEMORY);
