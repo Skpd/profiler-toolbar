@@ -36,7 +36,10 @@ class XhprofCollector extends AbstractCollector
      */
     public function collect(MvcEvent $mvcEvent)
     {
-        $data = $this->getFunctions(xhprof_disable());
+        $rawData = xhprof_disable();
+        $rawData = empty($rawData) ? [] : $rawData;
+
+        $data = $this->getFunctions($rawData);
 
         $this->data = [
             'memory' => [],
