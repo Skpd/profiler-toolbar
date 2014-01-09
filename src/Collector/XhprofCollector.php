@@ -36,7 +36,7 @@ class XhprofCollector extends AbstractCollector
      */
     public function collect(MvcEvent $mvcEvent)
     {
-        $data = xhprof_disable();
+        $data = $this->getFunctions(xhprof_disable());
 
         $this->data = [
             'memory' => [],
@@ -49,12 +49,16 @@ class XhprofCollector extends AbstractCollector
             $time = new MaxHeap();
             $call = new MaxHeap();
 
-            foreach ($data as $name => $values) {
-                if (!preg_match('/(?:Zend\\\\|Composer\\\\)/i', $name)) {
-                    $memory->insert(['name' => $name, 'value' => $values['pmu']]);
-                    $time->insert(['name' => $name, 'value' => $values['wt']]);
-                    $call->insert(['name' => $name, 'value' => $values['ct']]);
+            foreach ($data as $name => $entry) {
+                /** @var Entry $entry */
+
+                if (preg_match('/(?:Zend\\\\|Composer\\\\)/i', $entry->getName())) {
+                    continue;
                 }
+
+                $memory->insert(['name' => $entry->getName(), 'value' => $entry->getInclusiveMemory()]);
+                $time->insert(['name' => $entry->getName(), 'value' => $entry->getInclusiveTime()]);
+                $call->insert(['name' => $entry->getName(), 'value' => $entry->getCalls()]);
             }
 
             for ($i = 3; $i--;) {
@@ -96,9 +100,7 @@ class XhprofCollector extends AbstractCollector
 
             $entry->setCalls($values['ct']);
             $entry->setInclusiveTime($values['wt']);
-            $entry->setExclusiveTime($values['wt']);
             $entry->setInclusiveMemory($values['pmu']);
-            $entry->setExclusiveMemory($values['pmu']);
 
             $caller = explode('==>', $name, 2);
 
@@ -112,11 +114,20 @@ class XhprofCollector extends AbstractCollector
                 if (isset($collection['byName'][$caller[0]])) {
                     /** @var Entry $parent */
                     $parent = $collection['byName'][$caller[0]];
+                } else {
+                    $searchPosition = $position;
 
+                    while ($collection['byOrder'][--$searchPosition]) {
+                        if ($collection['byOrder'][$searchPosition]->getName() === $caller[0]) {
+                            /** @var Entry $parent */
+                            $parent = $collection['byOrder'][$searchPosition];
+                            break;
+                        }
+                    }
+                }
+
+                if (!empty($parent)) {
                     $parent->addCallee($entry);
-                    $parent->setExclusiveTime($parent->getExclusiveTime() - $entry->getInclusiveTime());
-                    $parent->setExclusiveMemory($parent->getExclusiveMemory() - $entry->getInclusiveMemory());
-
                     $entry->setCaller($parent);
                 }
 
@@ -129,6 +140,29 @@ class XhprofCollector extends AbstractCollector
             $collection['byName'][$name]        = $entry;
         }
 
+        foreach ($collection['byName'] as $entry) {
+            $this->countExclusive($entry);
+        }
+
         return $collection['byName'];
+    }
+
+    private function countExclusive(Entry $entry)
+    {
+        if ($entry->getExclusiveTime() === null) {
+            $entry->setExclusiveTime($entry->getInclusiveTime());
+            foreach ($entry->getCallees() as $callee) {
+                $this->countExclusive($callee);
+                $entry->setExclusiveTime($entry->getExclusiveTime() - ($callee->getInclusiveTime() / $callee->getCalls()));
+            }
+        }
+
+        if ($entry->getExclusiveMemory() === null) {
+            $entry->setExclusiveMemory($entry->getInclusiveMemory());
+            foreach ($entry->getCallees() as $callee) {
+                $this->countExclusive($callee);
+                $entry->setExclusiveMemory($entry->getExclusiveMemory() - ($callee->getInclusiveMemory() / $callee->getCalls()));
+            }
+        }
     }
 }
