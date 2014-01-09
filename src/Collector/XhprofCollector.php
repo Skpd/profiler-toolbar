@@ -2,6 +2,7 @@
 
 namespace Skpd\ProfilerToolbar\Collector;
 
+use Skpd\ProfilerToolbar\Entry;
 use Skpd\ProfilerToolbar\MaxHeap;
 use Zend\Mvc\MvcEvent;
 use ZendDeveloperTools\Collector\AbstractCollector;
@@ -75,5 +76,59 @@ class XhprofCollector extends AbstractCollector
     public function getHeaps()
     {
         return $this->data;
+    }
+
+    private function getFunctions(array $data)
+    {
+        $data = array_reverse($data, true);
+
+        $collection = [
+            'byName'  => [],
+            'byOrder' => []
+        ];
+        $position = 0;
+
+        $internalFunctions = get_defined_functions();
+        $internalFunctions = array_flip($internalFunctions['internal']);
+
+        foreach ($data as $name => $values) {
+            $entry = new Entry();
+
+            $entry->setCalls($values['ct']);
+            $entry->setInclusiveTime($values['wt']);
+            $entry->setExclusiveTime($values['wt']);
+            $entry->setInclusiveMemory($values['pmu']);
+            $entry->setExclusiveMemory($values['pmu']);
+
+            $caller = explode('==>', $name, 2);
+
+            if (count($caller) === 1) {
+                if (isset($collection['byOrder'][$position - 1])) {
+                    $entry->setCaller($collection['byOrder'][$position - 1]);
+                }
+
+                $entry->setName($caller[0]);
+            } else {
+                if (isset($collection['byName'][$caller[0]])) {
+                    /** @var Entry $parent */
+                    $parent = $collection['byName'][$caller[0]];
+
+                    $parent->addCallee($entry);
+                    $parent->setExclusiveTime($parent->getExclusiveTime() - $entry->getInclusiveTime());
+                    $parent->setExclusiveMemory($parent->getExclusiveMemory() - $entry->getInclusiveMemory());
+
+                    $entry->setCaller($parent);
+                }
+
+                $entry->setName($caller[1]);
+            }
+
+            $entry->setIsInternal(array_key_exists($entry->getName(), $internalFunctions));
+
+            $collection['byOrder'][$position++] = $entry;
+            $collection['byName'][$name]        = $entry;
+        }
+
+        return $collection['byName'];
     }
 }
