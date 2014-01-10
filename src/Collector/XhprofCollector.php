@@ -4,11 +4,20 @@ namespace Skpd\ProfilerToolbar\Collector;
 
 use Skpd\ProfilerToolbar\Entry;
 use Skpd\ProfilerToolbar\MaxHeap;
+use Skpd\ProfilerToolbar\Options;
 use Zend\Mvc\MvcEvent;
 use ZendDeveloperTools\Collector\AbstractCollector;
 
 class XhprofCollector extends AbstractCollector
 {
+    /** @var Options */
+    private $options;
+
+    public function __construct(Options $options)
+    {
+        $this->options = $options;
+    }
+
     /**
      * Collector Name.
      *
@@ -41,38 +50,39 @@ class XhprofCollector extends AbstractCollector
 
         $data = $this->getFunctions($rawData);
 
-        $this->data = [
-            'memory' => [],
-            'time' => [],
-            'call' => [],
-        ];
+        $heaps = [];
+
+        foreach ($this->options->getMetrics() as $name => $options) {
+            $this->data[$name] = [];
+            $heaps[$name] = new MaxHeap();
+        }
 
         if (!empty($data)) {
-            $memory = new MaxHeap();
-            $time = new MaxHeap();
-            $call = new MaxHeap();
 
-            foreach ($data as $name => $entry) {
+            foreach ($data as $entry) {
                 /** @var Entry $entry */
 
-                if (preg_match('/(?:Zend\\\\|Composer\\\\)/i', $entry->getName())) {
-                    continue;
-                }
+                foreach ($this->options->getMetrics() as $name => $options) {
+                    if ($options['skipInternal'] && $entry->isInternal()) {
+                        continue;
+                    }
 
-                $memory->insert(['name' => $entry->getName(), 'value' => $entry->getInclusiveMemory()]);
-                $time->insert(['name' => $entry->getName(), 'value' => $entry->getInclusiveTime()]);
-                $call->insert(['name' => $entry->getName(), 'value' => $entry->getCalls()]);
+                    if (!empty($options['skipPattern']) && preg_match($options['skipPattern'], $entry->getName())) {
+                        continue;
+                    }
+
+                    $heaps[$name]->insert([
+                        'name'  => $entry->getName(),
+                        'value' => $entry->{$options['getter']}()
+                    ]);
+                }
             }
 
-            for ($i = 3; $i--;) {
-                $value = $memory->extract();
-                $this->data['memory'][$value['name']] = round($value['value'] / 1024 / 1024, 2) . ' Mb';
-
-                $value = $time->extract();
-                $this->data['time'][$value['name']] = round($value['value'] / 1000, 3) . ' ms';
-
-                $value = $call->extract();
-                $this->data['call'][$value['name']] = $value['value'];
+            foreach ($this->options->getMetrics() as $name => $options) {
+                for ($i = $options['limit']; $i--;) {
+                    $value = $heaps[$name]->extract();
+                    $this->data[$name][$value['name']] = $value['value'];
+                }
             }
         }
     }
