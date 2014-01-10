@@ -120,7 +120,7 @@ class XhprofCollector extends AbstractCollector
                 } else {
                     $searchPosition = $position;
 
-                    while ($collection['byOrder'][--$searchPosition]) {
+                    while (isset($collection['byOrder'][--$searchPosition])) {
                         if ($collection['byOrder'][$searchPosition]->getName() === $caller[0]) {
                             /** @var Entry $parent */
                             $parent = $collection['byOrder'][$searchPosition];
