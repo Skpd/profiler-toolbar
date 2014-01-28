@@ -15,7 +15,7 @@ class Entry
     private $inclusiveMemory;
     private $exclusiveMemory;
 
-    private $isInternal;
+    private $internal;
 
     /**
      * @param int $exclusiveMemory
@@ -36,17 +36,17 @@ class Entry
     /**
      * @param bool $isInternal
      */
-    public function setIsInternal($isInternal)
+    public function setInternal($isInternal)
     {
-        $this->isInternal = $isInternal;
+        $this->internal = $isInternal;
     }
 
     /**
      * @return bool
      */
-    public function getIsInternal()
+    public function getInternal()
     {
-        return $this->isInternal;
+        return $this->internal;
     }
 
     /**
@@ -54,7 +54,7 @@ class Entry
      */
     public function isInternal()
     {
-        return $this->isInternal;
+        return $this->internal;
     }
 
     /**

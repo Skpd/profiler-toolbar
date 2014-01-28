@@ -147,7 +147,7 @@ class XhprofCollector extends AbstractCollector
                 $entry->setName($caller[1]);
             }
 
-            $entry->setIsInternal(array_key_exists($entry->getName(), $internalFunctions));
+            $entry->setInternal(array_key_exists($entry->getName(), $internalFunctions));
 
             $collection['byOrder'][$position++] = $entry;
             $collection['byName'][$name]        = $entry;
