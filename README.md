@@ -1,8 +1,8 @@
 Skpd\ProfilerToolbar, v1
 =====================
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/27e5dcf2-70f7-4e4d-9081-14b8b8e7ce9e/big.png)](https://insight.sensiolabs.com/projects/27e5dcf2-70f7-4e4d-9081-14b8b8e7ce9e)
 
 [![Build Status](https://travis-ci.org/Skpd/profiler-toolbar.png?branch=master)](https://travis-ci.org/Skpd/profiler-toolbar)
-[![Latest Stable Version](https://poser.pugx.org/Skpd/profiler-toolbar/v/stable.png)](https://packagist.org/packages/Skpd/profiler-toolbar)
 [![Total Downloads](https://poser.pugx.org/Skpd/profiler-toolbar/downloads.png)](https://packagist.org/packages/Skpd/profiler-toolbar)
 
 Introduction
