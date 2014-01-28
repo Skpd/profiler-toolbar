@@ -5,6 +5,7 @@
     "keywords": ["Zend Developer Tools","ZendDeveloperTools","profiler","zendframework2","Zend Framework 2","toolbar"],
     "homepage": "https://github.com/Skpd/profiler-toolbar",
     "minimum-stability": "dev",
+    "license": "MIT",
     "authors": [
         {
             "name": "Dmitry Shabanov",
