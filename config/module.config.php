@@ -2,6 +2,9 @@
 
 namespace Skpd\ProfilerToolbar;
 
+use Skpd\ProfilerToolbar\Collector\XhprofCollector;
+use Skpd\ProfilerToolbar\Options;
+
 return [
     'service_manager' => [
         'factories' => [
@@ -10,7 +13,7 @@ return [
                 /** @var Options $options */
                 $options = $serviceManager->get('Skpd\ProfilerToolbar\Options');
 
-                return new Collector\XhprofCollector($options);
+                return new XhprofCollector($options);
             },
             'Skpd\ProfilerToolbar\Options' => function ($serviceManager) {
                 /** @var \Zend\ServiceManager\ServiceManager $serviceManager */
