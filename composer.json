@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "zendframework/zendframework": ">=2.2.*",
+        "zendframework/zendframework": ">=2.2.0",
         "zendframework/zend-developer-tools": ">=0.0.2",
         "ext-xhprof": ">=0.9.2"
     },
